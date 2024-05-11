@@ -1,0 +1,107 @@
+l
+复制
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Towers of Hanoi</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+
+    .game-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 50px;
+    }
+
+    .tower {
+      width: 50px;
+      height: 300px;
+      background-color: #333;
+      border-radius: 5px;
+      margin: 0 20px;
+      position: relative;
+    }
+
+    .disk {
+      height: 30px;
+      background-color: #5cb85c;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      transition: all 1s ease;
+      position: absolute;
+    }
+
+    .controls {
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Towers of Hanoi</h1>
+  <div class="game-container">
+    <div class="tower" id="tower1"></div>
+    <div class="tower" id="tower2"></div>
+    <div class="tower" id="tower3"></div>
+  </div>
+  <div class="controls">
+    <label for="disk-count">Number of Disks:</label>
+    <select id="disk-count">
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+    </select>
+    <button id="start-btn">Start</button>
+    <button id="pause-btn">Pause</button>
+    <button id="resume-btn">Resume</button>
+    <label for="move-time">Move Time (ms):</label>
+    <input type="number" id="move-time" value="1000">
+  </div>
+
+  <script>
+    const THICKNESS = 60;
+    const TOPWIDTH = 100;
+    const INDENT = 10;
+    const GAP = 20;
+    const RATIO = 0.1;
+    let N = 3;
+
+    let disks = [];
+    let currentMoveTimeout = null;
+    let isGamePaused = false;
+    let instructions = [];
+    let stack = [[], [], []];
+
+    function createDisks() {
+      for (let i = N - 1; i >= 0; i--) {
+        const disk = document.createElement('div');
+        disk.className = 'disk';
+        disk.id = `layer${i}`;
+        disk.style.width = `${TOPWIDTH - (i * INDENT)}px`;
+        disk.style.bottom = `${i * THICKNESS + GAP}px`;
+        document.getElementById('tower1').appendChild(disk);
+        disks.push(disk);
+        stack[0].push(i);
+      }
+    }
+
+    function move(n, source, destin, temp) {
+      if (n === 1) {
+        instructions.push([source, destin]);
+      } else {
+        move(n - 1, source, temp, destin);
+        instructions.push([source, destin]);
+        move(n - 1, temp, destin, source);
+      }
+    }
+
+    function movedisk(k) {
+      if (k >= instructions.length) return;
+      const [from, to] = instructions[k];
+      const topId = stack[from].pop();
+      const disk = document.getElementById(`layer${topId}`);
+      const x0 = ((screen.width - TOPWIDTH) / 2.5 * from) + 'px';
+      const y0 = (N * THICKNESS) - (stack[from].length * THICKNESS) - GAP + 'px';
+      const x1 = ((screen.width - TOPWIDTH) / 2.5 
